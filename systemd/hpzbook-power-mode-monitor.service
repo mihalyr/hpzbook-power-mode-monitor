@@ -1,0 +1,8 @@
+# This service unit is only used by the correspondig timer to trigger a power
+# supply change event if the state has changed
+[Unit]
+Description=HP ZBook Power Mode Monitor
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/hpzbook-power-mode-check

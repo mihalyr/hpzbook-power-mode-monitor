@@ -1,0 +1,30 @@
+#!/bin/bash
+# On HP ZBook 15v G5 the battery/AC change power_supply event is not
+# recognized by udev and TLP won't change the power modes, as a workaround
+# here is a script to trigger an UDEV power_supply change action when the
+# power supply state has changed.
+
+set -eu
+
+# product_name="$(dmidecode | grep 'Product Name' | head -1 | cut -f2 -d:)"
+# if [ "$product_name" != " HP ZBook 15v G5" ]; then
+#     echo "Not a HP ZBook 15v G5. Exiting." >&2
+#     exit 1
+# fi
+
+STATE_FILE=/var/run/hpzbook-power-mode-monitor.state
+last_state="unknown"
+
+if [ -f "$STATE_FILE" ]; then
+	last_state="$(cat "$STATE_FILE")"
+fi
+
+curr_state="$(cat /sys/class/power_supply/ACAD/online)"
+
+if [ "$last_state" != "$curr_state" ]; then
+	echo "Power supply changed ACAD/online=$curr_state ($last_state)"
+	udevadm trigger -c change -s 'power_supply'
+	echo "$curr_state" > "$STATE_FILE"
+else
+	echo "Power supply unchanged ACAD/online=$curr_state"
+fi

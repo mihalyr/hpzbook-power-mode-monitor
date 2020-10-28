@@ -1,0 +1,10 @@
+# Systemd timer to periodically check power supply state and trigger UDEV events
+[Unit]
+Description=HP ZBook Power Mode Monitor
+
+[Timer]
+OnCalendar=minutely
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target
